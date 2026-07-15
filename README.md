@@ -7,8 +7,25 @@ An automated ETL pipeline that tracks Malaysia's key economic indicators — fue
 
 
 ## 🏗️ Architecture
-data.gov.my API → Python (Extract) → Raw CSV (data/raw/) → Python Transform (Clean & Join) → Processed CSV (data/processed/) → Airflow (Weekly Schedule) → Power BI (Visualize)
-
+         data.gov.my
+               │
+         Bank Negara
+               │
+               ▼
+         Python Extract
+               │
+               ▼
+       Data Cleaning
+               │
+               ▼
+      Combined Dataset
+               │
+               ▼
+     Apache Airflow DAG
+               │
+               ▼
+          Power BI
+          
 ## 📁 Project Structure
 ```
 ├── etl/
