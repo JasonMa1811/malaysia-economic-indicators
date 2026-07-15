@@ -3,7 +3,8 @@
 An automated ETL pipeline that tracks Malaysia's key economic indicators — fuel prices, CPI inflation, exchange rates and OPR — built with Python, Apache Airflow, and Power BI.
 
 ## 📊 Dashboard Preview
-<img width="2028" height="1062" alt="malaysia_indicators" src="https://github.com/user-attachments/assets/a23aba25-a2e2-4a91-ac2e-64cd3d9a3cee" />
+<img width="1367" height="789" alt="image" src="https://github.com/user-attachments/assets/5cd06fce-e914-4f74-95b8-fbce2e124471" />
+
 
 ## 🏗️ Architecture
 data.gov.my API → Python (Extract) → Raw CSV (data/raw/) → Python Transform (Clean & Join) → Processed CSV (data/processed/) → Airflow (Weekly Schedule) → Power BI (Visualize)
