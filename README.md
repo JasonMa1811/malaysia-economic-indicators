@@ -65,23 +65,24 @@ data.gov.my API → Python (Extract) → Raw CSV (data/raw/) → Python Transfor
 
 ### Steps
 1. Clone the repo
-git clone https://github.com/JasonMa1811/malaysia-economic-indicators.git
-cd malaysia-economic-indicators
-
+  ```
+  git clone https://github.com/JasonMa1811/malaysia-economic-indicators.git
+  cd malaysia-economic-indicators
+  ```
 2. Install dependencies
-pip install -r requirements.txt
+  pip install -r requirements.txt
 
 3. Run the pipeline manually
-python etl/run_pipeline.py
-
-This will:
-- Fetch raw data from APIs → saved to data/raw/
-- Clean and transform data → saved to data/processed/
-- Join all datasets → saved to data/processed/combined_indicators.csv
+  python etl/run_pipeline.py
+  
+  This will:
+  - Fetch raw data from APIs → saved to data/raw/
+  - Clean and transform data → saved to data/processed/
+  - Join all datasets → saved to data/processed/combined_indicators.csv
 
 4. Open dashboard
-- Open dashboard/malaysia_indicators.pbix in Power BI Desktop
-- Refresh data source to point to your local data/processed/ folder
+  - Open dashboard/malaysia_indicators.pbix in Power BI Desktop
+  - Refresh data source to point to your local data/processed/ folder
 
 ### Optional: Schedule with Airflow
 1. Install Apache Airflow on WSL/Ubuntu
