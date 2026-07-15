@@ -25,6 +25,17 @@ An automated ETL pipeline that tracks Malaysia's key economic indicators — fue
                │
                ▼
           Power BI
+
+## Data Model
+```
+         Fuel
+                 \
+         CPI -------> Combined Indicators
+                 /
+         USD
+               /
+         OPR
+```
           
 ## 📁 Project Structure
 ```
