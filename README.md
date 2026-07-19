@@ -123,31 +123,56 @@ dbt tests run automatically as part of every pipeline execution — `not_null` a
 
 The only supported way to run this project — Postgres and dbt are core to the pipeline now, not optional add-ons.
 
-**Prerequisites:** Docker Desktop only (Windows: WSL2 backend, enabled automatically by the installer).
+**Prerequisites:** Docker Desktop (Windows: WSL2 backend, enabled automatically by the installer), and [Git](https://git-scm.com/downloads) available from your command line.
 
-```bash
-git clone https://github.com/JasonMa1811/malaysia-economic-indicators.git
-cd malaysia-economic-indicators
+> **Docker Desktop must be open and running** before any `docker compose` command below — not just installed. Look for the whale icon 🐳 in your system tray showing "Docker Desktop is running." If a command fails with `failed to connect to the docker API` / `dockerDesktopLinuxEngine: The system cannot find the file specified`, this is why — open Docker Desktop, wait ~30-60 seconds, then retry.
 
-cp .env.example .env             # local config — see .env.example for what each value does
+> **No Git installed?** GitHub Desktop's bundled git is **not** the same as having `git` available in PowerShell/terminal — if `git clone` says `'git' is not recognized`, that's why. Fastest fix on Windows, straight from PowerShell:
+> ```powershell
+> winget install --id Git.Git -e --source winget
+> ```
+> Close and reopen your terminal afterward so it picks up the new `git` command. Alternatively, install [Git for Windows](https://git-scm.com/downloads) manually, or skip the command line entirely: on the repo's GitHub page, click **Code → Download ZIP**, extract it, and open a terminal in that extracted folder to continue from step 2 below.
 
-docker compose up airflow-init   # one-time: creates the Airflow metadata DB + admin user
-docker compose up -d             # starts everything: Postgres ×2, Airflow, pgAdmin
-```
+### Steps
 
-**Airflow UI** — [http://localhost:8080](http://localhost:8080) (`airflow` / `airflow`). Unpause `malaysia_indicators_pipeline` and trigger it manually, or wait for the weekday 1am UTC schedule.
+1. **Clone the repo**
+   ```bash
+   cd Documents
+   git clone https://github.com/JasonMa1811/malaysia-economic-indicators.git
+   cd malaysia-economic-indicators
+   ```
 
-**pgAdmin** — [http://localhost:5050](http://localhost:5050) (`admin@admin.com` / `admin`) — browse `marts.combined_indicators` directly, or run your own SQL against it.
+2. **Set up local config**
+   ```bash
+   cp .env.example .env
+   ```
+   See `.env.example` for what each value does — safe local-dev defaults, no editing required to just get running.
 
-> **First-time pgAdmin setup:** pgAdmin's config runs in "Desktop Mode" (no login-per-user), and dbt's auto-import of `pgadmin/servers.json` doesn't fire under that mode — a known pgAdmin quirk, not a bug in this repo. So on first use, the server list will be empty. Add it once, manually:
-> 1. Click **Add New Server**
-> 2. General tab → Name: anything, e.g. `Malaysia Indicators`
-> 3. Connection tab → Host: `postgres-data` (not `localhost` — pgAdmin talks to it over the internal Docker network), Port: `5432`, Maintenance database: `malaysia_indicators`, Username: `malaysia`, Password: `malaysia`
-> 4. Save, and tick "Save Password" so it's not needed again
->
-> This only needs doing once per pgAdmin container — the connection persists across restarts via its own Docker volume.
+3. **One-time Airflow setup** — creates the metadata database and admin login
+   ```bash
+   docker compose up airflow-init
+   ```
 
-**Power BI** — open `dashboard/malaysia_indicators.pbix`, connect to PostgreSQL at `localhost:5433`, database `malaysia_indicators`, and read from `marts.combined_indicators`.
+4. **Start everything** — Postgres ×2, Airflow (4 services), pgAdmin
+   ```bash
+   docker compose up -d
+   ```
+
+5. **Open the Airflow UI** — [http://localhost:8080](http://localhost:8080) (`airflow` / `airflow`). Unpause `malaysia_indicators_pipeline` and trigger it manually, or wait for the weekday 1am UTC schedule.
+
+6. **Open pgAdmin** — [http://localhost:5050](http://localhost:5050) (`admin@admin.com` / `admin`) — browse `marts.combined_indicators` directly, or run your own SQL against it.
+
+   > **First-time pgAdmin setup required:** pgAdmin's config runs in "Desktop Mode" (no login-per-user), and dbt's auto-import of `pgadmin/servers.json` doesn't fire under that mode — a known pgAdmin quirk, not a bug in this repo. So on first use, the server list will be empty. Add it once, manually:
+   > 1. Click **Add New Server**
+   > 2. General tab → Name: anything, e.g. `Malaysia Indicators`
+   > 3. Connection tab → Host: `postgres-data` (not `localhost` — pgAdmin talks to it over the internal Docker network), Port: `5432`, Maintenance database: `malaysia_indicators`, Username: `malaysia`, Password: `malaysia`
+   > 4. Save, and tick "Save Password" so it's not needed again
+   >
+   > This only needs doing once per pgAdmin container — the connection persists across restarts via its own Docker volume.
+
+7. **Open the dashboard** — `dashboard/malaysia_indicators.pbix` in Power BI Desktop, connect to PostgreSQL at `localhost:5433`, database `malaysia_indicators`, reading from `marts.combined_indicators`.
+
+### Stopping
 
 ```bash
 docker compose down          # stop everything
