@@ -3,7 +3,7 @@
 An automated data pipeline that tracks Malaysia's key economic indicators — fuel prices, CPI inflation, exchange rates and OPR — built with Python, Apache Airflow, PostgreSQL, dbt, and Power BI. Fully containerized: anyone can run the entire stack with two Docker Compose commands.
 
 ## 📊 Dashboard Preview
-<img width="1367" height="789" alt="image" src="https://github.com/user-attachments/assets/5cd06fce-e914-4f74-95b8-fbce2e124471" />
+<img width="2094" height="1184" alt="image" src="https://github.com/user-attachments/assets/4af00fcd-8d16-42a0-8093-4189ad5ec56f" />
 
 ## 🏗️ Architecture
 
