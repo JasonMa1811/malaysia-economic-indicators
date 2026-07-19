@@ -10,27 +10,28 @@ An automated data pipeline that tracks Malaysia's key economic indicators — fu
 ```
 data.gov.my / Bank Negara Malaysia (BNM)
               │
-              ▼
-     Python extract (Airflow)
+              ▼  Python — API calls
+        Extract (raw CSVs)
               │
-              ▼
-   raw schema  (Postgres — unmodified landing zone)
+              ▼  Python — pandas/SQLAlchemy
+      raw schema (Postgres)
               │
-              ▼
-        dbt staging models
+              ▼  dbt — SQL
+     staging views (Postgres)
      (filtering, COICOP mapping)
               │
-              ▼
-         dbt marts models
+              ▼  dbt — SQL
+      marts tables (Postgres)
   (daily date spine + forward-fill,
       dbt tests for data quality)
               │
               ▼
-   marts.combined_indicators (Postgres)
+   marts.combined_indicators
               │
               ▼
           Power BI
 ```
+Two different tools save data into Postgres, at two different stages: **Python** lands the raw, unmodified data (`raw` schema) — dbt has no involvement here. **dbt** then reads that raw data and saves its own transformed output back into Postgres (`staging` and `marts` schemas) — dbt never touches the original CSVs directly, only what Python already loaded.
 
 This is an **ELT** pipeline, not ETL — raw data lands in Postgres unmodified, and all cleaning/joining logic lives in versioned SQL (dbt), not pandas. Everything runs inside Docker: Airflow orchestrates it, Postgres stores it, dbt transforms it, pgAdmin lets you browse it.
 
