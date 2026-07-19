@@ -4,8 +4,6 @@ An automated data pipeline that tracks Malaysia's key economic indicators — fu
 
 ## 📊 Dashboard Preview
 <img width="1367" height="789" alt="image" src="https://github.com/user-attachments/assets/5cd06fce-e914-4f74-95b8-fbce2e124471" />
-<<<<<<< Updated upstream
-
 
 ## 🏗️ Architecture
 
@@ -51,19 +49,7 @@ date_spine (continuous calendar)
                         ▼
              marts.combined_indicators
 ```
->>>>>>> Stashed changes
 
-## Data Model
-```
-         Fuel
-                 \
-         CPI -------> Combined Indicators
-                 /
-         USD
-               /
-         OPR
-```
-          
 ## 📁 Project Structure
 ```
 ├── etl/
@@ -96,7 +82,7 @@ date_spine (continuous calendar)
 │   └── malaysia_indicators.pbix      # Power BI dashboard (reads from marts.combined_indicators)
 │
 ├── pgadmin/
-│   └── servers.json                  # Pre-configured Postgres connection for pgAdmin
+│   └── servers.json                  # Intended to auto-load the Postgres connection in pgAdmin — see note below, doesn't fire in Desktop Mode
 │
 ├── docker-compose.yml                # Postgres (x2) + Airflow (4 services) + pgAdmin
 ├── Dockerfile                        # Airflow image + pandas/requests/dbt
@@ -135,28 +121,6 @@ dbt tests run automatically as part of every pipeline execution — `not_null` a
 
 ## 🐳 Run with Docker
 
-<<<<<<< Updated upstream
-### Steps
-1. Clone the repo
-  ```
-  git clone https://github.com/JasonMa1811/malaysia-economic-indicators.git
-  cd malaysia-economic-indicators
-  ```
-2. Install dependencies
-  pip install -r requirements.txt
-
-3. Run the pipeline manually
-  python etl/run_pipeline.py
-  
-  This will:
-  - Fetch raw data from APIs → saved to data/raw/
-  - Clean and transform data → saved to data/processed/
-  - Join all datasets → saved to data/processed/combined_indicators.csv
-
-4. Open dashboard
-  - Open dashboard/malaysia_indicators.pbix in Power BI Desktop
-  - Refresh data source to point to your local data/processed/ folder
-=======
 The only supported way to run this project — Postgres and dbt are core to the pipeline now, not optional add-ons.
 
 **Prerequisites:** Docker Desktop only (Windows: WSL2 backend, enabled automatically by the installer).
@@ -174,7 +138,14 @@ docker compose up -d             # starts everything: Postgres ×2, Airflow, pgA
 **Airflow UI** — [http://localhost:8080](http://localhost:8080) (`airflow` / `airflow`). Unpause `malaysia_indicators_pipeline` and trigger it manually, or wait for the weekday 1am UTC schedule.
 
 **pgAdmin** — [http://localhost:5050](http://localhost:5050) (`admin@admin.com` / `admin`) — browse `marts.combined_indicators` directly, or run your own SQL against it.
->>>>>>> Stashed changes
+
+> **First-time pgAdmin setup:** pgAdmin's config runs in "Desktop Mode" (no login-per-user), and dbt's auto-import of `pgadmin/servers.json` doesn't fire under that mode — a known pgAdmin quirk, not a bug in this repo. So on first use, the server list will be empty. Add it once, manually:
+> 1. Click **Add New Server**
+> 2. General tab → Name: anything, e.g. `Malaysia Indicators`
+> 3. Connection tab → Host: `postgres-data` (not `localhost` — pgAdmin talks to it over the internal Docker network), Port: `5432`, Maintenance database: `malaysia_indicators`, Username: `malaysia`, Password: `malaysia`
+> 4. Save, and tick "Save Password" so it's not needed again
+>
+> This only needs doing once per pgAdmin container — the connection persists across restarts via its own Docker volume.
 
 **Power BI** — open `dashboard/malaysia_indicators.pbix`, connect to PostgreSQL at `localhost:5433`, database `malaysia_indicators`, and read from `marts.combined_indicators`.
 
@@ -182,6 +153,8 @@ docker compose up -d             # starts everything: Postgres ×2, Airflow, pgA
 docker compose down          # stop everything
 docker compose down -v       # stop and wipe all data (fresh start)
 ```
+
+> **Windows/WSL2 users:** Docker Desktop runs everything inside a WSL2 Linux VM, which can hold onto several GB of RAM even after `docker compose down`. To fully release it: `wsl --shutdown` (this also closes any open WSL terminals — reopen them after). To cap how much RAM Docker's allowed to use in the first place instead of shutting it down each time, add a `.wslconfig` file in your Windows user folder — see the [WSL2 settings docs](https://learn.microsoft.com/en-us/windows/wsl/wsl-config#wslconfig).
 
 ## 📦 Data Sources
 - Fuel Prices: https://data.gov.my/data-catalogue/fuelprice
