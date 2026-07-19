@@ -1,0 +1,11 @@
+version: 2
+
+sources:
+  - name: raw
+    schema: raw
+    description: "Unmodified data landed straight from the extract scripts, before any cleaning."
+    tables:
+      - name: fuelprice
+      - name: cpi
+      - name: exchange_rate
+      - name: opr

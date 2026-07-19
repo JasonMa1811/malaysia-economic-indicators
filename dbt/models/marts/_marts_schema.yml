@@ -1,0 +1,48 @@
+version: 2
+
+models:
+  - name: date_spine
+    columns:
+      - name: date
+        tests:
+          - not_null
+          - unique
+
+  - name: combined_indicators
+    description: "One row per calendar day, with fuel/CPI/exchange rate/OPR all forward-filled onto a continuous daily grain. Power BI reads this table directly."
+    columns:
+      - name: date
+        tests:
+          - not_null
+          - unique
+      - name: month
+        tests:
+          - not_null
+
+  - name: int_fuel_daily_filled
+    columns:
+      - name: date
+        tests:
+          - not_null
+          - unique
+
+  - name: int_cpi_daily_filled
+    columns:
+      - name: date
+        tests:
+          - not_null
+          - unique
+
+  - name: int_exchange_daily_filled
+    columns:
+      - name: date
+        tests:
+          - not_null
+          - unique
+
+  - name: int_opr_daily_filled
+    columns:
+      - name: date
+        tests:
+          - not_null
+          - unique

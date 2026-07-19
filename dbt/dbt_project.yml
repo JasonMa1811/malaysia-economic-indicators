@@ -1,0 +1,23 @@
+name: 'malaysia_indicators'
+version: '1.0.0'
+config-version: 2
+
+profile: 'malaysia_indicators'
+
+model-paths: ["models"]
+macro-paths: ["macros"]
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+models:
+  malaysia_indicators:
+    staging:
+      # Cheap to recompute, always fresh — no reason to materialize as tables
+      +materialized: view
+      +schema: staging
+    marts:
+      # Power BI reads these directly, so store them physically
+      +materialized: table
+      +schema: marts
