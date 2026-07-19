@@ -8,27 +8,6 @@ An automated data pipeline that tracks Malaysia's key economic indicators — fu
 
 
 ## 🏗️ Architecture
-         data.gov.my
-               │
-         Bank Negara
-               │
-               ▼
-         Python Extract
-               │
-               ▼
-       Data Cleaning
-               │
-               ▼
-      Combined Dataset
-               │
-               ▼
-     Apache Airflow DAG
-               │
-               ▼
-          Power BI
-=======
-
-## 🏗️ Architecture
 
 ```
 data.gov.my / Bank Negara Malaysia (BNM)
