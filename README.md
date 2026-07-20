@@ -3,7 +3,7 @@
 An automated data pipeline that tracks Malaysia's key economic indicators — fuel prices, CPI inflation, exchange rates and OPR — built with Python, Apache Airflow, PostgreSQL, dbt, and Power BI. Fully containerized: anyone can run the entire stack with two Docker Compose commands.
 
 ## 📊 Dashboard Preview
-<img width="2094" height="1184" alt="image" src="https://github.com/user-attachments/assets/4af00fcd-8d16-42a0-8093-4189ad5ec56f" />
+<img width="1367" height="789" alt="image" src="https://github.com/user-attachments/assets/5cd06fce-e914-4f74-95b8-fbce2e124471" />
 
 ## 🏗️ Architecture
 
@@ -22,8 +22,7 @@ data.gov.my / Bank Negara Malaysia (BNM)
               │
               ▼  dbt — SQL
       marts tables (Postgres)
-  (daily date spine + forward-fill,
-      dbt tests for data quality)
+  (daily date spine + forward-fill, dbt tests for data quality)
               │
               ▼
    marts.combined_indicators
@@ -31,6 +30,7 @@ data.gov.my / Bank Negara Malaysia (BNM)
               ▼
           Power BI
 ```
+
 Two different tools save data into Postgres, at two different stages: **Python** lands the raw, unmodified data (`raw` schema) — dbt has no involvement here. **dbt** then reads that raw data and saves its own transformed output back into Postgres (`staging` and `marts` schemas) — dbt never touches the original CSVs directly, only what Python already loaded.
 
 This is an **ELT** pipeline, not ETL — raw data lands in Postgres unmodified, and all cleaning/joining logic lives in versioned SQL (dbt), not pandas. Everything runs inside Docker: Airflow orchestrates it, Postgres stores it, dbt transforms it, pgAdmin lets you browse it.
@@ -49,6 +49,10 @@ date_spine (continuous calendar)
                         │
                         ▼
              marts.combined_indicators
+                        │
+                        ▼
+              marts.monthly_changes
+       (monthly snapshot + MoM/YoY % change, via LAG window functions — powers the Insights page in Power BI)
 ```
 
 ## 📁 Project Structure
@@ -74,6 +78,7 @@ date_spine (continuous calendar)
 │   └── models/
 │       ├── staging/                  # 1:1 cleaning per source, materialized as views
 │       └── marts/                    # Daily spine + forward-fill + final join + tests
+│                                        + monthly_changes.sql (MoM/YoY %, powers Insights page)
 │
 ├── data/
 │   ├── raw/                          # Raw CSVs (gitignored — regenerates every run)
@@ -104,6 +109,8 @@ date_spine (continuous calendar)
 - **BNM API** — Bank Negara Malaysia (OPR decisions)
 
 ## 📈 Dashboard Features
+
+**Page 1 — Overview** (monitoring: what's happening now)
 - 6 KPI cards — Latest RON95, RON97, Diesel, CPI Index, USD/MYR and OPR
 - Fuel Price Trend — RON95, RON97 and Diesel, forward-filled daily
 - CPI Inflation Trend — Monthly inflation index, forward-filled daily
@@ -111,14 +118,20 @@ date_spine (continuous calendar)
 - OPR Trend — BNM monetary policy decisions, forward-filled daily
 - Interactive date slicer — Filter all visuals by date range
 
+**Page 2 — Insights** (analysis: why, and so what)
+- 3 insight cards, each pairing a small supporting chart with a written Observation → Interpretation, reading from `marts.monthly_changes`:
+  - **Diesel subsidy shock** — Diesel vs USD/MYR (% change), correctly scaled so the divergence between a policy-driven spike and currency movement is visible
+  - **Inflation holding steady** — CPI year-over-year growth, showing the fuel shock hasn't yet fed through to headline inflation
+  - **Currency and rates diverged** — USD/MYR vs OPR on a secondary axis, showing rate hikes alone didn't defend the ringgit in real time
+- Biggest Monthly Moves table — every month ranked by size of move, backing the insight cards with the full underlying data rather than just the headline claim
+
 ## 🧪 Data Quality
 dbt tests run automatically as part of every pipeline execution — `not_null` and `unique` checks on every model's date column. A failed test fails the Airflow task, so bad data never silently reaches the dashboard.
 
 ## 🔍 Key Insights
-- Diesel prices spiked to RM6.70 in April 2026 despite ringgit strengthening — indicating domestic subsidy removal rather than currency weakness
-- USD/MYR peaked at 4.77 in 2024 (weak ringgit) contributing to import cost inflation
-- BNM cut OPR from 3.00% to 2.75% in July 2025 to stimulate the economy
-- CPI has risen consistently since 2022, driven by Food and Transport categories
+- **Diesel subsidy shock**: diesel rose 81.6% month-over-month in March 2026 — the largest single-month move of any indicator tracked, isolated to diesel and not mirrored in the exchange rate, consistent with a targeted subsidy cut rather than global oil prices
+- **Inflation holding steady**: CPI year-over-year growth stayed within a narrow 1.4%-2.0% band through mid-2026, even after the diesel spike — the fuel shock hasn't visibly reached headline inflation yet
+- **Currency and rates diverged**: the ringgit weakened through 2022-2023 even as OPR rose from 1.75% to 3.00%; it only strengthened after rates had peaked, and BNM's later cut to 2.75% (July 2025) came only after that recovery
 
 ## 🐳 Run with Docker
 
@@ -138,7 +151,6 @@ The only supported way to run this project — Postgres and dbt are core to the 
 
 1. **Clone the repo**
    ```bash
-   cd Documents
    git clone https://github.com/JasonMa1811/malaysia-economic-indicators.git
    cd malaysia-economic-indicators
    ```
