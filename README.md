@@ -4,6 +4,7 @@ An automated data pipeline that tracks Malaysia's key economic indicators — fu
 
 ## 📊 Dashboard Preview
 <img width="1367" height="789" alt="image" src="https://github.com/user-attachments/assets/5cd06fce-e914-4f74-95b8-fbce2e124471" />
+<img width="2093" height="1181" alt="image" src="https://github.com/user-attachments/assets/2eb8e0d0-7484-4990-8df6-495e0f13c169" />
 
 ## 🏗️ Architecture
 
